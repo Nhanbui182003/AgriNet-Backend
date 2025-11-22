@@ -24,7 +24,6 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
 			entities: [__dirname + '/../**/*.entity{.ts,.js}'],
 			migrations: [__dirname + '/../database/migrations/*{.ts,.js}'],
 			extra: {
-				timezone: 'Z',
 				// max connection pool size
 				// Use 'connectionLimit' for MySQL, 'max' for PostgreSQL
 				connectionLimit: this.configService.get(

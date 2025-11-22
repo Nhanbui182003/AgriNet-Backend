@@ -12,15 +12,12 @@ export class CommentDetailResponseDto {
 	content: string;
 
 	@Expose()
-	@TransformToUtc()
 	createdAt: Date;
 
 	@Expose()
-	@TransformToUtc()
 	updatedAt: Date;
 
 	@Expose()
-	@TransformToUtc()
 	deletedAt: Date;
 
 	@Expose()
