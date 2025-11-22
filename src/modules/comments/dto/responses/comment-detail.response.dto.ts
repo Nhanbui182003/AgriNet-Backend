@@ -1,7 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 import { UserProfileResponseDto } from '@app/modules/users/dto/responses/user-profile.response.dto';
 import { Type } from 'class-transformer';
-import { TransformToUtc } from '@app/common/transformers/date.transformer';
 
 @Exclude()
 export class CommentDetailResponseDto {
