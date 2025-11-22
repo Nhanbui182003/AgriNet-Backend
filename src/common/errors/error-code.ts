@@ -14,4 +14,5 @@ export enum ErrorCode {
 
 	POST_NOT_FOUND = 'Post not found',
 	COMMENT_NOT_FOUND = 'Comment not found',
+	CATEGORY_NOT_FOUND = 'Category not found',
 }

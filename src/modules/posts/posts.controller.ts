@@ -29,6 +29,7 @@ import { User } from '../users/entities/user.entity';
 import { PostDetailResponseDto } from './dto/responses/post-detail.response.dto';
 import {
 	toDto,
+	toDtos,
 	toPaginateDtos,
 } from '@app/common/transformers/dto.transformer';
 import { GetMyPostRequestDto } from './dto/requests/get-my-post.request.dto';
@@ -38,7 +39,7 @@ import { SingleFileValidationPipe } from '@app/common/transformers/single-file-v
 import { ConfigService } from '@nestjs/config';
 import { ConfigKeys } from '@app/config/config-key.enum';
 import { UpdatePostRequestDto } from './dto/requests/update-post.request.dto';
-import { GetAllPostRequestDto } from './dto/requests/get-all-post.request.dto';
+import { GetRecommendPostRequestDto } from './dto/requests/get-recommend-post.request.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -50,10 +51,9 @@ export class PostsController {
 	@Get()
 	@ApiOperation({ summary: '[PUBLIC] List post' })
 	@Responser.handle('List post')
-	@Responser.paginate()
-	async listPost(@Query() getAllPostRequestDto: GetAllPostRequestDto) {
-		const data = await this.postsService.listPost(getAllPostRequestDto);
-		return toPaginateDtos(PostDetailResponseDto, data);
+	async listPost(@Query() input: GetRecommendPostRequestDto) {
+		const data = await this.postsService.listPost(input);
+		return toDtos(PostDetailResponseDto, data);
 	}
 
 	@Get('list-my-post')

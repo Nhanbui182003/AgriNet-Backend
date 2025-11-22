@@ -1,0 +1,39 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+
+export class GetRecommendPostRequestDto {
+	@ApiProperty({ type: String, required: false })
+	@IsString()
+	@IsOptional()
+	categoryName: string;
+
+	@ApiProperty({ type: String, required: false })
+	@IsString()
+	@IsOptional()
+	productName: string;
+
+	@ApiProperty({ type: String, required: false })
+	@IsString()
+	@IsOptional()
+	price: string;
+
+	@ApiProperty({ type: String, required: false })
+	@IsString()
+	@IsOptional()
+	quantity: string;
+
+	@ApiProperty({ type: Number, required: false })
+	@IsNumber()
+	@IsOptional()
+	latitude: number;
+
+	@ApiProperty({ type: Number, required: false })
+	@IsNumber()
+	@IsOptional()
+	longitude: number;
+
+	@ApiProperty({ type: String, required: false })
+	@IsString()
+	@IsOptional()
+	address: string;
+}

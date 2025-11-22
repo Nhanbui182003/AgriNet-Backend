@@ -37,6 +37,7 @@ import { UpdateProfileRequestDto } from './dto/requests/update-profile.request.d
 import { ConfigKeys } from '@app/config/config-key.enum';
 import { ConfigService } from '@nestjs/config';
 import { GetUsersRequestDto } from './dto/requests/get-users.request.dto';
+import { CreateMessageRequestDto } from './dto/requests/create-message.request.dto';
 
 @Controller('users')
 export class UsersController {
@@ -114,5 +115,13 @@ export class UsersController {
 			updateProfileDto,
 		);
 		return toDto(UserProfileResponseDto, data);
+	}
+
+	@Post('create-message')
+	@ApiBearerAuth()
+	@ApiOperation({ summary: '[PUBLIC] Create message' })
+	@Responser.handle('Create message')
+	async createMessage(@Body() createMessageDto: CreateMessageRequestDto) {
+		return await this.usersService.createMessage(createMessageDto);
 	}
 }

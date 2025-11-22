@@ -5,38 +5,52 @@ import { CreatePostRequestDto } from './dto/requests/create-post.request.dto';
 import { PostImageRepository } from '../post-images/post-images.repository';
 import {
 	ErrorCode,
+	HttpBadRequestError,
 	HttpForbiddenError,
 	HttpNotFoundError,
 } from '@app/common/errors';
 import { UpdatePostRequestDto } from './dto/requests/update-post.request.dto';
 import { GetAllPostRequestDto } from './dto/requests/get-all-post.request.dto';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { CategoryRepository } from '../categories/categories.repository';
+import { GetRecommendPostRequestDto } from './dto/requests/get-recommend-post.request.dto';
+import { In } from 'typeorm';
 
 @Injectable()
 export class PostsService {
 	constructor(
 		private readonly postRepository: PostRepository,
 		private readonly postImageRepository: PostImageRepository,
+		private readonly categoryRepository: CategoryRepository,
+		private readonly httpService: HttpService,
 	) {}
 
-	async listPost(getAllPostRequestDto: GetAllPostRequestDto) {
-		const queryBuilder = this.postRepository
-			.createQueryBuilder('post')
-			.leftJoinAndSelect('post.category', 'category')
-			.leftJoinAndSelect('post.user', 'user')
-			.leftJoinAndSelect('post.images', 'images')
-			.leftJoinAndSelect('post.embedding', 'embedding');
-
-		if (getAllPostRequestDto.categoryId) {
-			queryBuilder.andWhere('post.categoryId = :categoryId', {
-				categoryId: getAllPostRequestDto.categoryId,
-			});
-		}
-		queryBuilder.orderBy('post.createdAt', 'DESC');
-
-		return await this.postRepository.paginate(
-			queryBuilder,
-			getAllPostRequestDto,
+	async listPost(input: GetRecommendPostRequestDto) {
+		const response = await firstValueFrom(
+			this.httpService.post('http://217.216.72.107:9001/recommend?top_k=30', {
+				categoryName: input.categoryName,
+				productName: input.productName,
+				price: input.price,
+				quantity: input.quantity,
+				latitude: input.latitude,
+				longitude: input.longitude,
+				address: input.address,
+			}),
 		);
+
+		const postIds = response.data.top_results.map((post) => {
+			return post.id;
+		});
+
+		const posts = await this.postRepository.find({
+			where: {
+				id: In(postIds),
+			},
+			relations: ['images', 'embedding', 'category', 'user'],
+		});
+
+		return posts;
 	}
 
 	async getMyPost(userId: string, getMyPostRequestDto: GetMyPostRequestDto) {
@@ -62,28 +76,70 @@ export class PostsService {
 	}
 
 	async createPost(userId: string, createPostRequestDto: CreatePostRequestDto) {
-		const post = this.postRepository.create({
-			title: createPostRequestDto.title,
-			content: createPostRequestDto.content,
-			latitude: createPostRequestDto.latitude,
-			longitude: createPostRequestDto.longitude,
-			address: createPostRequestDto.address,
-			userId: userId,
-		});
+		try {
+			const response = await firstValueFrom(
+				this.httpService.post(
+					'http://217.216.72.107:9001/api/extract-post/extract-post',
+					{
+						title: createPostRequestDto.title,
+						content: createPostRequestDto.content,
+					},
+				),
+			);
 
-		const savedPost = await this.postRepository.save(post);
+			const category = await this.categoryRepository.findOne({
+				where: {
+					name: response.data.categoryName,
+				},
+			});
 
-		if (createPostRequestDto.images) {
-			for (const image of createPostRequestDto.images) {
-				await this.postImageRepository.save(
-					this.postImageRepository.create({
-						postId: savedPost.id,
-						url: image,
-					}),
-				);
+			if (!category) {
+				throw new HttpNotFoundError(ErrorCode.CATEGORY_NOT_FOUND);
 			}
+
+			const post = this.postRepository.create({
+				title: createPostRequestDto.title,
+				content: createPostRequestDto.content,
+				latitude: createPostRequestDto.latitude,
+				longitude: createPostRequestDto.longitude,
+				address: createPostRequestDto.address,
+				userId: userId,
+				categoryId: category.id,
+			});
+
+			const savedPost = await this.postRepository.save(post);
+
+			if (createPostRequestDto.images) {
+				for (const image of createPostRequestDto.images) {
+					await this.postImageRepository.save(
+						this.postImageRepository.create({
+							postId: savedPost.id,
+							url: image,
+						}),
+					);
+				}
+			}
+
+			const addItemResponse = await firstValueFrom(
+				this.httpService.post('http://217.216.72.107:9001/recommend/add-item', {
+					id: savedPost.id,
+					title: createPostRequestDto.title,
+					content: createPostRequestDto.content,
+					latitude: createPostRequestDto.latitude,
+					longitude: createPostRequestDto.longitude,
+					address: createPostRequestDto.address,
+					categoryName: category.name,
+					productName: response.data.productName,
+					price: response.data.price,
+					quantity: response.data.quantity,
+				}),
+			);
+			console.log(addItemResponse.data);
+
+			return savedPost;
+		} catch (error) {
+			throw new HttpBadRequestError(error.message);
 		}
-		return savedPost;
 	}
 
 	async findOne(id: string) {

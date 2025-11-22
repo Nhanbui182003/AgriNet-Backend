@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserRepository } from './users.repository';
 import { IsNotExist } from '@app/utils/validators/is-not-exists.validator';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User])],
+	imports: [TypeOrmModule.forFeature([User]), HttpModule],
 	controllers: [UsersController],
 	providers: [UsersService, UserRepository, IsNotExist],
 	exports: [UsersService],

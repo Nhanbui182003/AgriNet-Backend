@@ -12,6 +12,8 @@ import { ConfigService } from '@nestjs/config';
 import { ConfigKeys } from '@app/config/config-key.enum';
 import { UpdateProfileRequestDto } from './dto/requests/update-profile.request.dto';
 import { GetUsersRequestDto } from './dto/requests/get-users.request.dto';
+import { CreateMessageRequestDto } from './dto/requests/create-message.request.dto';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +21,7 @@ export class UsersService {
 		private readonly usersRepository: UserRepository,
 		private readonly configService: ConfigService,
 		private readonly emailService: EmailService,
+		private readonly httpService: HttpService,
 	) {}
 
 	async findOne(
@@ -104,5 +107,14 @@ export class UsersService {
 		}
 
 		return await this.updateUser(id, updateProfileDto);
+	}
+
+	async createMessage(createMessageDto: CreateMessageRequestDto) {
+		return await this.httpService.post(
+			'http://217.216.72.107:9001/api/chat-agents',
+			{
+				message: createMessageDto.message,
+			},
+		);
 	}
 }
