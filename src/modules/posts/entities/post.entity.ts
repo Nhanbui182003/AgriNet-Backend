@@ -13,6 +13,7 @@ import { Category } from '@app/modules/categories/entities/category.entity';
 import { User } from '@app/modules/users/entities/user.entity';
 import { PostImage } from '@app/modules/post-images/entities/post-image.entity';
 import { PostEmbedding } from '@app/modules/post-embeddings/entities/post-embedding.entity';
+import { Comment } from '@app/modules/comments/entities/comment.entity';
 
 @Entity({ name: 'Posts' })
 export class Post extends EntityHelper {
@@ -53,4 +54,7 @@ export class Post extends EntityHelper {
 
 	@OneToOne(() => PostEmbedding, (postEmbedding) => postEmbedding.post)
 	embedding: PostEmbedding;
+
+	@OneToMany(() => Comment, (comment) => comment.post)
+	comments: Comment[];
 }

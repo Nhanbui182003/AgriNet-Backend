@@ -28,6 +28,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { PostImagesModule } from './modules/post-images/post-images.module';
 import { PostEmbeddingsModule } from './modules/post-embeddings/post-embeddings.module';
+import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
 	imports: [
@@ -98,6 +99,7 @@ import { PostEmbeddingsModule } from './modules/post-embeddings/post-embeddings.
 		PostsModule,
 		PostImagesModule,
 		PostEmbeddingsModule,
+		CommentsModule,
 	],
 	controllers: [],
 	providers: [

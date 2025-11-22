@@ -4,6 +4,7 @@ import { EntityHelper } from '@app/utils/entity-helper';
 import { UserRole } from '../enums/user-role.enum';
 import { UserStatus } from '../enums/user-status.enum';
 import { Post } from '@app/modules/posts/entities/post.entity';
+import { Comment } from '@app/modules/comments/entities/comment.entity';
 
 @Entity({ name: 'Users' })
 export class User extends EntityHelper {
@@ -42,4 +43,7 @@ export class User extends EntityHelper {
 
 	@OneToMany(() => Post, (post) => post.user)
 	posts: Post[];
+
+	@OneToMany(() => Comment, (comment) => comment.user)
+	comments: Comment[];
 }

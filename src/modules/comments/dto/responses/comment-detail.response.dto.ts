@@ -1,0 +1,29 @@
+import { Exclude, Expose } from 'class-transformer';
+import { UserProfileResponseDto } from '@app/modules/users/dto/responses/user-profile.response.dto';
+import { Type } from 'class-transformer';
+
+@Exclude()
+export class CommentDetailResponseDto {
+	@Expose()
+	id: string;
+
+	@Expose()
+	content: string;
+
+	@Expose()
+	createdAt: Date;
+
+	@Expose()
+	updatedAt: Date;
+
+	@Expose()
+	deletedAt: Date;
+
+	@Expose()
+	@Type(() => CommentDetailResponseDto)
+	childComments: CommentDetailResponseDto[];
+
+	@Expose()
+	@Type(() => UserProfileResponseDto)
+	user: UserProfileResponseDto;
+}

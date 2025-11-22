@@ -3,6 +3,7 @@ import { PostRepository } from './posts.repository';
 import { GetMyPostRequestDto } from './dto/requests/get-my-post.request.dto';
 import { CreatePostRequestDto } from './dto/requests/create-post.request.dto';
 import { PostImageRepository } from '../post-images/post-images.repository';
+import { ErrorCode, HttpNotFoundError } from '@app/common/errors';
 
 @Injectable()
 export class PostsService {
@@ -53,6 +54,12 @@ export class PostsService {
 			}
 		}
 		return savedPost;
+	}
+
+	async findOne(id: string) {
+		return await this.postRepository.findOne({
+			where: { id },
+		});
 	}
 
 	async getPostDetail(id: string) {
