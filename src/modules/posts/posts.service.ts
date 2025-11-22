@@ -54,4 +54,13 @@ export class PostsService {
 		}
 		return savedPost;
 	}
+
+	async getPostDetail(id: string) {
+		const post = await this.postRepository.findOne({
+			where: { id },
+			relations: ['images', 'embedding', 'category', 'user'],
+		});
+
+		return post;
+	}
 }

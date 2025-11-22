@@ -2,6 +2,7 @@ import {
 	Body,
 	Controller,
 	Get,
+	Param,
 	Post,
 	Query,
 	UploadedFile,
@@ -107,5 +108,14 @@ export class PostsController {
 			getMyPostRequestDto,
 		);
 		return toPaginateDtos(PostDetailResponseDto, data);
+	}
+
+	@Get(':id')
+	@ApiBearerAuth()
+	@ApiOperation({ summary: '[ALL ROLES] Get post detail' })
+	@Responser.handle('Get post detail')
+	async getPostDetail(@Param('id') id: string) {
+		const data = await this.postsService.getPostDetail(id);
+		return toDto(PostDetailResponseDto, data);
 	}
 }
