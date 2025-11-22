@@ -3,6 +3,8 @@ import {
 	Controller,
 	Get,
 	Param,
+	Patch,
+	Delete,
 	Post,
 	Query,
 	UploadedFile,
@@ -35,6 +37,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { SingleFileValidationPipe } from '@app/common/transformers/single-file-validation-pipe';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKeys } from '@app/config/config-key.enum';
+import { UpdatePostRequestDto } from './dto/requests/update-post.request.dto';
+import { GetAllPostRequestDto } from './dto/requests/get-all-post.request.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -42,6 +46,33 @@ export class PostsController {
 		private readonly postsService: PostsService,
 		private readonly configService: ConfigService,
 	) {}
+
+	@Get()
+	@ApiOperation({ summary: '[PUBLIC] List post' })
+	@Responser.handle('List post')
+	@Responser.paginate()
+	async listPost(@Query() getAllPostRequestDto: GetAllPostRequestDto) {
+		const data = await this.postsService.listPost(getAllPostRequestDto);
+		return toPaginateDtos(PostDetailResponseDto, data);
+	}
+
+	@Get('list-my-post')
+	@ApiBearerAuth()
+	@ApiOperation({ summary: '[FARMER] List my post' })
+	@Responser.handle('List my post')
+	@Responser.paginate()
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(UserRole.FARMER)
+	async listMyPost(
+		@CurrentUser() user: User,
+		@Query() getMyPostRequestDto: GetMyPostRequestDto,
+	) {
+		const data = await this.postsService.getMyPost(
+			user.id,
+			getMyPostRequestDto,
+		);
+		return toPaginateDtos(PostDetailResponseDto, data);
+	}
 
 	@Post('upload-post-image')
 	@UseInterceptors(FileInterceptor('file', { storage: storageConfig('posts') }))
@@ -92,24 +123,6 @@ export class PostsController {
 		return toDto(PostDetailResponseDto, data);
 	}
 
-	@Get('list-my-post')
-	@ApiBearerAuth()
-	@ApiOperation({ summary: '[FARMER] List my post' })
-	@Responser.handle('List my post')
-	@Responser.paginate()
-	@UseGuards(AuthGuard, RolesGuard)
-	@Roles(UserRole.FARMER)
-	async listMyPost(
-		@CurrentUser() user: User,
-		@Query() getMyPostRequestDto: GetMyPostRequestDto,
-	) {
-		const data = await this.postsService.getMyPost(
-			user.id,
-			getMyPostRequestDto,
-		);
-		return toPaginateDtos(PostDetailResponseDto, data);
-	}
-
 	@Get(':id')
 	@ApiBearerAuth()
 	@ApiOperation({ summary: '[ALL ROLES] Get post detail' })
@@ -117,5 +130,29 @@ export class PostsController {
 	async getPostDetail(@Param('id') id: string) {
 		const data = await this.postsService.getPostDetail(id);
 		return toDto(PostDetailResponseDto, data);
+	}
+
+	@Patch(':id')
+	@ApiBearerAuth()
+	@ApiOperation({ summary: '[FARMER] Update post' })
+	@Responser.handle('Update post')
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(UserRole.FARMER)
+	async updatePost(
+		@Param('id') id: string,
+		@Body() updatePostRequestDto: UpdatePostRequestDto,
+	) {
+		const data = await this.postsService.updatePost(id, updatePostRequestDto);
+		return toDto(PostDetailResponseDto, data);
+	}
+
+	@Delete(':id')
+	@ApiBearerAuth()
+	@ApiOperation({ summary: '[FARMER] Delete post' })
+	@Responser.handle('Delete post')
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(UserRole.FARMER)
+	async deletePost(@CurrentUser() user: User, @Param('id') id: string) {
+		return await this.postsService.deletePost(user.id, id);
 	}
 }
