@@ -65,7 +65,7 @@ export class PostsController {
 	) {
 		const fileUrl =
 			this.configService.get(ConfigKeys.BACKEND_DOMAIN, { infer: true }) +
-			'/public/avatars/' +
+			'/public/posts/' +
 			file.filename;
 
 		return {
