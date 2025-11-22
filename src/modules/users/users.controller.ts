@@ -118,7 +118,6 @@ export class UsersController {
 	}
 
 	@Post('create-message')
-	@ApiBearerAuth()
 	@ApiOperation({ summary: '[PUBLIC] Create message' })
 	@Responser.handle('Create message')
 	async createMessage(@Body() createMessageDto: CreateMessageRequestDto) {

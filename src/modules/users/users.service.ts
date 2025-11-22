@@ -14,6 +14,7 @@ import { UpdateProfileRequestDto } from './dto/requests/update-profile.request.d
 import { GetUsersRequestDto } from './dto/requests/get-users.request.dto';
 import { CreateMessageRequestDto } from './dto/requests/create-message.request.dto';
 import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class UsersService {
@@ -110,12 +111,12 @@ export class UsersService {
 	}
 
 	async createMessage(createMessageDto: CreateMessageRequestDto) {
-		return await this.httpService.post(
-			'http://217.216.72.107:9001/api/chat-agents',
-			{
+		const response = await firstValueFrom(
+			this.httpService.post('http://217.216.72.107:9001/api/chat-agents', {
 				message: createMessageDto.message,
 				session_id: createMessageDto.session_id,
-			},
+			}),
 		);
+		return response.data.data;
 	}
 }

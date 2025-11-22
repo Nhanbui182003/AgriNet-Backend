@@ -8,7 +8,15 @@ import { IsNotExist } from '@app/utils/validators/is-not-exists.validator';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User]), HttpModule],
+	imports: [
+		TypeOrmModule.forFeature([User]),
+		HttpModule.registerAsync({
+			useFactory: () => ({
+				timeout: 20000,
+				maxRedirects: 5,
+			}),
+		}),
+	],
 	controllers: [UsersController],
 	providers: [UsersService, UserRepository, IsNotExist],
 	exports: [UsersService],
