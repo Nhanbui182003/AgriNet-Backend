@@ -6,6 +6,7 @@ import {
 	ParseFilePipe,
 	Patch,
 	Post,
+	Query,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
@@ -24,7 +25,10 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { UserRole } from './enums/user-role.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { toDto } from '@app/common/transformers/dto.transformer';
+import {
+	toDto,
+	toPaginateDtos,
+} from '@app/common/transformers/dto.transformer';
 import { UserProfileResponseDto } from './dto/responses/user-profile.response.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storageConfig } from '@app/utils/file-config';
@@ -32,6 +36,7 @@ import { SingleFileValidationPipe } from '@app/common/transformers/single-file-v
 import { UpdateProfileRequestDto } from './dto/requests/update-profile.request.dto';
 import { ConfigKeys } from '@app/config/config-key.enum';
 import { ConfigService } from '@nestjs/config';
+import { GetUsersRequestDto } from './dto/requests/get-users.request.dto';
 
 @Controller('users')
 export class UsersController {
@@ -39,6 +44,15 @@ export class UsersController {
 		private readonly usersService: UsersService,
 		private readonly configService: ConfigService,
 	) {}
+
+	@Get('list-user')
+	@ApiOperation({ summary: '[ALL ROLES] List user' })
+	@Responser.handle('List user')
+	@Responser.paginate()
+	async listUser(@Query() getUserRequestDto: GetUsersRequestDto) {
+		const data = await this.usersService.getUsers(getUserRequestDto);
+		return toPaginateDtos(UserProfileResponseDto, data);
+	}
 
 	@Post('upload-avatar')
 	@UseInterceptors(

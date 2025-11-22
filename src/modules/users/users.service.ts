@@ -11,6 +11,7 @@ import { EmailService } from '@app/services/email/email.service';
 import { ConfigService } from '@nestjs/config';
 import { ConfigKeys } from '@app/config/config-key.enum';
 import { UpdateProfileRequestDto } from './dto/requests/update-profile.request.dto';
+import { GetUsersRequestDto } from './dto/requests/get-users.request.dto';
 
 @Injectable()
 export class UsersService {
@@ -61,6 +62,29 @@ export class UsersService {
 		}
 
 		return toDto(UserProfileResponseDto, userData);
+	}
+
+	async getUsers(getUserRequestDto: GetUsersRequestDto) {
+		const queryBuilder = this.usersRepository.createQueryBuilder('user');
+
+		if (getUserRequestDto.name) {
+			queryBuilder.andWhere(
+				"(user.firstName || ' ' || user.lastName) LIKE :name",
+				{
+					name: `%${getUserRequestDto.name}%`,
+				},
+			);
+		}
+
+		if (getUserRequestDto.role) {
+			queryBuilder.andWhere('user.role = :role', {
+				role: getUserRequestDto.role,
+			});
+		}
+
+		queryBuilder.orderBy('user.createdAt', 'DESC');
+
+		return await this.usersRepository.paginate(queryBuilder, getUserRequestDto);
 	}
 
 	async uploadAvatar(userId: string, filename: string) {

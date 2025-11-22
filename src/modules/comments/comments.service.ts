@@ -21,12 +21,14 @@ export class CommentsService {
 			throw new HttpNotFoundError(ErrorCode.POST_NOT_FOUND);
 		}
 
-		const parentComment = await this.commentRepository.findOne({
-			where: { id: createCommentRequestDto.parentCommentId },
-		});
+		if (createCommentRequestDto.parentCommentId) {
+			const parentComment = await this.commentRepository.findOne({
+				where: { id: createCommentRequestDto.parentCommentId },
+			});
 
-		if (!parentComment) {
-			throw new HttpNotFoundError(ErrorCode.COMMENT_NOT_FOUND);
+			if (!parentComment) {
+				throw new HttpNotFoundError(ErrorCode.COMMENT_NOT_FOUND);
+			}
 		}
 
 		const comment = await this.commentRepository.save(
