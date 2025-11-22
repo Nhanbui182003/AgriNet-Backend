@@ -114,6 +114,7 @@ export class UsersService {
 			'http://217.216.72.107:9001/api/chat-agents',
 			{
 				message: createMessageDto.message,
+				session_id: createMessageDto.session_id,
 			},
 		);
 	}

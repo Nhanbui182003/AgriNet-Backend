@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class GetRecommendPostRequestDto {
 	@ApiProperty({ type: String, required: false })
@@ -25,12 +26,14 @@ export class GetRecommendPostRequestDto {
 	@ApiProperty({ type: Number, required: false })
 	@IsNumber()
 	@IsOptional()
-	latitude: number;
+	@Transform(({ value }) => (value ? Number(value) : undefined))
+	latitude?: number;
 
 	@ApiProperty({ type: Number, required: false })
 	@IsNumber()
 	@IsOptional()
-	longitude: number;
+	@Transform(({ value }) => (value ? Number(value) : undefined))
+	longitude?: number;
 
 	@ApiProperty({ type: String, required: false })
 	@IsString()
