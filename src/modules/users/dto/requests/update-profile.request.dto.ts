@@ -27,6 +27,14 @@ export class UpdateProfileRequestDto {
 	phone: string;
 
 	@ApiProperty({
+		description: 'The avatar of the user',
+		example: 'https://example.com/avatar.jpg',
+	})
+	@IsString()
+	@IsOptional()
+	avatar: string;
+
+	@ApiProperty({
 		description: 'The latitude of the user',
 		example: 10.7758,
 	})

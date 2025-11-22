@@ -27,7 +27,7 @@ export class CreatePostImagesTable1763774801015 implements MigrationInterface {
 					{
 						name: 'fileName',
 						type: 'varchar',
-						isNullable: false,
+						isNullable: true,
 					},
 					{
 						name: 'url',

@@ -30,10 +30,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { storageConfig } from '@app/utils/file-config';
 import { SingleFileValidationPipe } from '@app/common/transformers/single-file-validation-pipe';
 import { UpdateProfileRequestDto } from './dto/requests/update-profile.request.dto';
+import { ConfigKeys } from '@app/config/config-key.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly configService: ConfigService,
+	) {}
 
 	@Post('upload-avatar')
 	@UseInterceptors(
@@ -57,10 +62,16 @@ export class UsersController {
 	@UseGuards(AuthGuard)
 	async uploadAvatar(
 		@UploadedFile(SingleFileValidationPipe) file: Express.Multer.File,
-		@CurrentUser() user: User,
 	) {
-		const data = await this.usersService.uploadAvatar(user.id, file.filename);
-		return toDto(UserProfileResponseDto, data);
+		const fileUrl =
+			this.configService.get(ConfigKeys.BACKEND_DOMAIN, { infer: true }) +
+			'/public/avatars/' +
+			file.filename;
+
+		return {
+			filename: file.filename,
+			fileUrl: fileUrl,
+		};
 	}
 
 	@Get('profile')

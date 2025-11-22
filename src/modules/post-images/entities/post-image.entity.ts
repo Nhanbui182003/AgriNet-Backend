@@ -8,7 +8,7 @@ export class PostImage extends EntityHelper {
 	@Column({ type: 'uuid', nullable: false, unique: true })
 	postId: string;
 
-	@Column({ type: 'varchar', nullable: false })
+	@Column({ type: 'varchar', nullable: true })
 	fileName: string;
 
 	@Column({ type: 'varchar', nullable: false })

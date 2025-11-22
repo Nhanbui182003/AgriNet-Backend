@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class LoginRequestDto {
-	@ApiProperty({ type: String, example: 'bisdevt00@gmail.com' })
+	@ApiProperty({ type: String, example: 'le.huu.anh84@example.com' })
 	@IsNotEmpty()
 	@IsEmail()
 	@IsString()
