@@ -65,6 +65,9 @@ export class PostsService {
 		const post = this.postRepository.create({
 			title: createPostRequestDto.title,
 			content: createPostRequestDto.content,
+			latitude: createPostRequestDto.latitude,
+			longitude: createPostRequestDto.longitude,
+			address: createPostRequestDto.address,
 			userId: userId,
 		});
 
